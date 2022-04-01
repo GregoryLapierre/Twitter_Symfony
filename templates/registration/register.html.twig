@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+        {{parent()}}
+        {{ encore_entry_link_tags('index') }}
+{% endblock %}
+
+{% block javascripts %}
+        {{parent()}}
+        {{ encore_entry_script_tags('index') }}
+{% endblock %}
+
+{% block title %}S'incrire{% endblock %}
+
+{% block body %}
+    <h1>Formulaire d'inscription</h1>
+
+     <div class="formulaire">
+        {{ form_start(registrationForm) }}
+        {{ form_row(registrationForm.email) }}
+        {{ form_row(registrationForm.username) }}
+        {{ form_row(registrationForm.plainPassword, {
+            label: 'Password'
+            })
+        }}
+
+        <button type="submit" class="btn btn-secondary">S'inscrire</button>
+    </div>
+    {{ form_end(registrationForm) }}
+{% endblock %}

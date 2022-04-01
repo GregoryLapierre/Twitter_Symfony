@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Twitter!{% endblock %}</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+        {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+
+        {% endblock %}
+
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+        {% endblock %}
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{{ path('app_index')}}">Twitter</a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                </ul>
+
+                <form class="d-flex" action="{{ path("app_search") }}">
+                    <input class="form-control me-1" type="search" name="search" placeholder="Rechercher" aria-label="Search">
+                    <button class="btn btn-outline-secondary" type="submit">Rechercher</button>
+                </form>
+
+                <ul class="navbar-nav">
+                    {% if app.user %}
+                        <li class="nav-item mr-auto">
+                            <a class="nav-link headerLinks font-weight-bold" href="#">{{ app.user.username }}</a>
+                        </li>
+                        <li class="nav-item mr-auto">
+                            <a class="nav-link float-right headerLinks" href="{{ path("app_logout") }}">Déconnexion</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link headerLinks" href="{{ path('app_register') }}">Inscription</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link headerLinks" href="{{ path('app_login') }}">Connexion</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                </div>
+            </div>
+        </nav>
+        {% block body %}{% endblock %}
+    </body>
+</html>

@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+        {{parent()}}
+        {{ encore_entry_link_tags('index') }}
+{% endblock %}
+
+{% block javascripts %}
+        {{parent()}}
+        {{ encore_entry_script_tags('index') }}
+{% endblock %}
+
+{% block title %}Hello SearchController!{% endblock %}
+
+{% block body %}
+
+{% for post in posts %}
+<div class="list-group">
+  <a href="{{path('app_post', {'id': post.id})}}" class="list-group-item list-group-item-action">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mb-1">{{ post.title }}</h5>
+      <small class="text-muted">{{ post.createdat|date("d/m/Y à H:i") }}</small>
+    </div>
+    <p>{{ post.content }}</p>
+  </a>
+</div>
+{% endfor %}
+
+{% endblock %}
