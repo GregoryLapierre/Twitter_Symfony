@@ -16,42 +16,50 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class IndexController extends AbstractController
 {
+    #[Route('/page{page}/search{search}/order{order}', name: 'app_index_search', methods:['GET'])]
     #[Route('/', name: 'app_index')]
     public function index(PostRepository $postRepository, Request $request, EntityManagerInterface $manager): Response
-    {   $posts = $postRepository
-            ->findSearch();
-    
-       
-            $post = new Post();
-            $post -> setStatus('Ouvert');
-            $form = $this->createFormBuilder($post)
-                         ->add('title', TextType::class,[
-                            'label'=>'Titre'
-                         ])
-                         ->add('content', TextareaType::class,[
-                            'label'=>'Message',
-                            'attr' =>['rows'=>5]
-                         ]);
+    {
+        $page = $request->get('page') ?? 1;
+        $search = $request->get('search') ?? '';
+        $order = $request->get('order') ?? 'new';
 
-                        if ($this->isGranted('ROLE_ADMIN')) {
-                            $form->add('status', ChoiceType::class, [
-                            'choices'  => [
-                                'Ouvert' => 'Ouvert',
-                                'Fermé' => 'Fermé',
-                                'Modéré' => 'Modéré'       
-                                ],
-                            'placeholder'=>'Choisir un statut',
-                            'label'=>'Statut'   
-                            ]);
-                        };
-                        $form = $form->getForm();
-            $form->handleRequest($request);
+        $posts = $postRepository->search($page, $search, $order);
 
-            if($form->isSubmitted() && $form->isValid()){
-                $user = $this->getUser();
+        $pages = $postRepository->countPages($search);
 
-                $post->setCreatedAt(new \DateTimeImmutable());
-                $post->setUser($user);
+        
+        $post = new Post();
+        $post->setStatus('Ouvert');
+        $form = $this->createFormBuilder($post)
+                ->add('title', TextType::class,[
+                'label'=>'Titre'
+                ])
+                ->add('content', TextareaType::class,[
+                'label'=>'Message',
+                'attr' =>['rows'=>5]
+                ]);
+
+        if ($this->isGranted('ROLE_ADMIN')) {
+            $form->add('status', ChoiceType::class, [
+            'choices'  => [
+                'Ouvert' => 'Ouvert',
+                'Fermé' => 'Fermé',
+                'Modéré' => 'Modéré'       
+                ],
+            'placeholder'=>'Choisir un statut',
+            'label'=>'Statut'   
+            ]);
+        };
+        $form = $form->getForm();
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid())
+        {
+            $user = $this->getUser();
+
+            $post->setCreatedAt(new \DateTimeImmutable());
+            $post->setUser($user);
 
             $manager->persist($post);
             $manager->flush();
@@ -63,7 +71,11 @@ class IndexController extends AbstractController
         return $this->render('index/index.html.twig', [
             'controller_name' => 'IndexController',
             'posts'=> $posts,
-            'formPost'=> $form->createView()
+            'formPost'=> $form->createView(),
+            'pages' => $pages,
+            'currentPage' => $page,
+            'search'=> 0,
+            'order' => $order
         ]);
     }
 

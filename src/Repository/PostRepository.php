@@ -16,6 +16,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PostRepository extends ServiceEntityRepository
 {
+    private const perPage = 3;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Post::class);
@@ -45,23 +47,43 @@ class PostRepository extends ServiceEntityRepository
         }
     }
 
-    public function findSearch($order = 'DESC')
+    public function search($page = 1, $search = '', $order = 'popular')
     {
-        return $this->createQueryBuilder('p')
+        $offset = ($page - 1) * self::perPage;
+        
+        if($order == 'new'){
+            $order = 'DESC';
+        }
+        else{
+            $order = 'ASC';
+        }
+        
+        $req = $this->createQueryBuilder('p')
             ->orderBy('p.created_at', $order)
-            ->getQuery()
-            ->getResult()
+            ->setFirstResult($offset)
+            ->setMaxResults(self::perPage)
         ;
+
+        if ($search) {
+            $req->where('p.title LIKE :search')
+            ->setParameter('search', "%$search%");
+        }
+
+        return $req->getQuery()->getResult();
     }
 
-    public function search($value)
-    {   //SELECT * FROM post as l WHERE l.titre LIKE "%xxx%" ORDER BY l.titre, l.auteur
-        return $this->createQueryBuilder('p')//le paramètre l représente la table post (comme un alias dans une requête SQL)
-            ->where('p.title LIKE :val')
-            ->setParameter('val', "%$value%")
-            ->orderBy('p.title', 'ASC')
-            ->getQuery()
-            ->getResult()
-        ;
+    public function countPages($search = null){
+        $req = $this->createQueryBuilder('p')
+            ->select('count(p.id) AS count');
+
+        if ($search) {
+            $req->where('p.title LIKE :search')
+            ->setParameter('search', "%$search%");
+        }
+
+        $total = $req->getQuery()->getSingleScalarResult();
+        
+         // On calcule le nombre de pages total
+         return ceil($total / self::perPage);
     }
 }

@@ -17,7 +17,7 @@
     <div class="list-group">
         <div class="list-group-item">
             <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1"></h5>
+            <h4 class="mb-1">{{ post.user.username }}</h4>
             <small class="text-muted">{{ post.createdat|date("d/m/Y à H:i") }}</small>
             </div>
             <p>{{ post.content }}</p>
