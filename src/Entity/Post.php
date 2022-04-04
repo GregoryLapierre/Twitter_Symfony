@@ -27,9 +27,15 @@ class Post
     #[ORM\Column(type: 'text')]
     private $content;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'post')]
     #[ORM\JoinColumn(nullable: false)]
     private $user;
+
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'post')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $comments;
+
+    public $countComments;
 
 
     public function __construct()
@@ -101,5 +107,10 @@ class Post
         $this->user = $user;
 
         return $this;
+    }
+
+    public function getComments()
+    {
+        return $this->comments;
     }
 }
