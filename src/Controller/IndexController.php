@@ -17,18 +17,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class IndexController extends AbstractController
 {
     #[Route('/page{page}/search{search}/order{order}', name: 'app_index_search', methods:['GET'])]
+    #[Route('/search', name: 'app_index_search_simple', methods:['POST'])]
     #[Route('/', name: 'app_index')]
     public function index(PostRepository $postRepository, Request $request, EntityManagerInterface $manager): Response
     {
         $page = $request->get('page') ?? 1;
-        $search = $request->get('search') ?? '';
-        $order = $request->get('order') ?? 'new';
+        $search = $request->get('search') ?? 0;
+        $order = $request->get('order') ?? 'popular';
 
         $posts = $postRepository->search($page, $search, $order);
+        
+        
 
         $pages = $postRepository->countPages($search);
 
-        
         $post = new Post();
         $post->setStatus('Ouvert');
         $form = $this->createFormBuilder($post)
@@ -43,9 +45,9 @@ class IndexController extends AbstractController
         if ($this->isGranted('ROLE_ADMIN')) {
             $form->add('status', ChoiceType::class, [
             'choices'  => [
-                'Ouvert' => 'Ouvert',
-                'Fermé' => 'Fermé',
-                'Modéré' => 'Modéré'       
+                'opened' => 'Ouvert',
+                'closed' => 'Fermé',
+                'moderated' => 'Modéré'       
                 ],
             'placeholder'=>'Choisir un statut',
             'label'=>'Statut'   
@@ -74,7 +76,7 @@ class IndexController extends AbstractController
             'formPost'=> $form->createView(),
             'pages' => $pages,
             'currentPage' => $page,
-            'search'=> 0,
+            'search'=> $search,
             'order' => $order
         ]);
     }

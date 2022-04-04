@@ -16,7 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PostRepository extends ServiceEntityRepository
 {
-    private const perPage = 3;
+    private const perPage = 4;
 
     public function __construct(ManagerRegistry $registry)
     {
@@ -51,25 +51,44 @@ class PostRepository extends ServiceEntityRepository
     {
         $offset = ($page - 1) * self::perPage;
         
-        if($order == 'new'){
-            $order = 'DESC';
+        if($order == 'new' || $order == 'popular'){
+            $orderDirection = 'DESC';
         }
         else{
-            $order = 'ASC';
+            $orderDirection = 'ASC';
         }
-        
+
         $req = $this->createQueryBuilder('p')
-            ->orderBy('p.created_at', $order)
+            ->addSelect('count(c.id) AS countComments')
+            ->leftJoin('p.comments', 'c')
+            ->groupBy('p.id')
             ->setFirstResult($offset)
             ->setMaxResults(self::perPage)
         ;
 
-        if ($search) {
-            $req->where('p.title LIKE :search')
-            ->setParameter('search', "%$search%");
+        if($order == 'new' || $order == 'old'){
+            
+            $req->orderBy('p.created_at', $orderDirection);
+        }
+        else{
+            $req->orderBy('countComments', $orderDirection);
         }
 
-        return $req->getQuery()->getResult();
+        if ($search) {
+            $req->where('p.title LIKE :search')
+            ->orWhere('p.content LIKE :hashtag')
+            ->setParameter('search', "%$search%")
+            ->setParameter('hashtag', "%#$search%");
+        }
+
+        $posts = $req->getQuery()->getResult();
+
+        foreach($posts as $post){
+            $post[0]->countComments = $post['countComments'];
+        }
+        $posts = array_column($posts, 0); // Récupère les objets Post
+
+        return $posts;
     }
 
     public function countPages($search = null){
@@ -78,7 +97,9 @@ class PostRepository extends ServiceEntityRepository
 
         if ($search) {
             $req->where('p.title LIKE :search')
-            ->setParameter('search', "%$search%");
+            ->orWhere('p.content LIKE :hashtag')
+            ->setParameter('search', "%$search%")
+            ->setParameter('hashtag', "%#$search%");
         }
 
         $total = $req->getQuery()->getSingleScalarResult();
