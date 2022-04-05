@@ -17,6 +17,8 @@ class DashboardController extends AbstractDashboardController
     public function index(): Response
     {
         $routeBuilder = $this->container->get(AdminUrlGenerator::class);
+
+        // Redirection vers le PostCrud
         $url = $routeBuilder->setController(PostCrudController::class)->generateUrl();
 
         return $this->redirect($url);
@@ -44,6 +46,8 @@ class DashboardController extends AbstractDashboardController
             ->setTitle('Twitter Symfony');
     }
 
+
+    // Menu de navigation
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');

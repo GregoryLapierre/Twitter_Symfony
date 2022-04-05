@@ -55,6 +55,10 @@
   </ul>
 </div>
 
+<div class="">
+    <h5>{{ (posts|length) }} résultats</h5>
+</div>
+
 {% for post in posts %}
 <div class="list-group">
   <a href="{{path('app_post', {'id': post.id})}}" class="list-group-item list-group-item-action">

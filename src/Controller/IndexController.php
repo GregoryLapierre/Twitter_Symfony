@@ -21,21 +21,25 @@ class IndexController extends AbstractController
     #[Route('/', name: 'app_index')]
     public function index(PostRepository $postRepository, Request $request, EntityManagerInterface $manager): Response
     {
+        // Récupération des valeurs reçues par URL ou formulaire de recherche
         $page = $request->get('page') ?? 1;
         $search = $request->get('search') ?? 0;
         $order = $request->get('order') ?? 'popular';
         
-        if(empty($search))
-        {
-            $search = 0;
+        if (empty($search)) {
+            $search = 0; // Remplace une recherche avec un champs vide par l'entier 0
         }
 
+        // Recherche des posts par page, titre, hashtag
         $posts = $postRepository->search($page, $search, $order);
         
+        // Compte le nombre de pages total
         $pages = $postRepository->countPages($search);
 
+        // Création du formulaire
         $post = new Post();
         $post->setStatus('opened');
+
         $form = $this->createFormBuilder($post)
                 ->add('title', TextType::class,[
                 'label'=>'Titre'
@@ -48,6 +52,7 @@ class IndexController extends AbstractController
         $form = $form->getForm();
         $form->handleRequest($request);
 
+        // Traitement du formulaire
         if($this->getUser() && $form->isSubmitted() && $form->isValid())
         {
             $user = $this->getUser();
@@ -72,20 +77,4 @@ class IndexController extends AbstractController
             'order' => $order
         ]);
     }
-
-    
-
-
-
-    // #[Route('/{id}', name: 'showPost')]
-    // public function show(int $id, PostRepository $postRepository): Response
-    // {
-        
-
-    //     // ...
-    //     return $this->render('post/index.html.twig', [
-    //         'controller_name' => 'PostController',
-    //         'posts'=> $posts
-    //     ]);
-    // }
 }

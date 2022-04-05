@@ -47,16 +47,11 @@ class PostRepository extends ServiceEntityRepository
         }
     }
 
+
+
     public function search($page = 1, $search = '', $order = 'popular')
     {
-        $offset = ($page - 1) * self::perPage;
-        
-        if($order == 'new' || $order == 'popular'){
-            $orderDirection = 'DESC';
-        }
-        else{
-            $orderDirection = 'ASC';
-        }
+        $offset = ($page - 1) * self::perPage; // Nombre de Posts à partir duquel les récupérer
 
         $req = $this->createQueryBuilder('p')
             ->addSelect('count(c.id) AS countComments')
@@ -68,7 +63,15 @@ class PostRepository extends ServiceEntityRepository
             ->setMaxResults(self::perPage)
         ;
 
-        if($order == 'new' || $order == 'old'){
+        // Tri des posts
+        if($order == 'new' || $order == 'popular') {
+            $orderDirection = 'DESC';
+        }
+        else {
+            $orderDirection = 'ASC';
+        }
+
+        if($order == 'new' || $order == 'old') {
             
             $req->orderBy('p.created_at', $orderDirection);
         }
@@ -76,6 +79,8 @@ class PostRepository extends ServiceEntityRepository
             $req->orderBy('countComments', $orderDirection);
         }
 
+
+        // Recherche par titre et hashtag
         if ($search) {
             $req->andWhere('p.title LIKE :search OR p.content LIKE :hashtag')
             ->setParameter('search', "%$search%")
@@ -84,15 +89,19 @@ class PostRepository extends ServiceEntityRepository
 
         $posts = $req->getQuery()->getResult();
 
-        foreach($posts as $post){
+        // Assigne le nombre de commentaires aux posts
+        foreach($posts as $post) {
             $post[0]->countComments = $post['countComments'];
         }
-        $posts = array_column($posts, 0); // Récupère les objets Post
+        $posts = array_column($posts, 0); // Récupère les objets Post (colonne [0])
 
         return $posts;
     }
 
-    public function countPages($search = null){
+
+    // Compte le nombre total de pages
+    public function countPages($search = null)
+    {
         $req = $this->createQueryBuilder('p')
             ->select('count(p.id) AS count')
             ->andWhere('p.status != :status')

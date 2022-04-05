@@ -18,7 +18,10 @@ class PostController extends AbstractController
     #[Route('/post/{id}', name: 'app_post', methods:['GET', 'POST'])]
     public function post(Post $post, CommentRepository $commentRepository, Request $request, EntityManagerInterface $manager)
     {
+        // Récupération des commentaires du post
         $comments = $commentRepository->findByPost($post->getId());
+
+        // Créatoin du formulaire
         $comment = new Comment();
 
         $form = $this->createFormBuilder($comment)
@@ -29,7 +32,7 @@ class PostController extends AbstractController
         ->getForm()
         ->handleRequest($request);
 
-
+        // Traitement du formulaire
         if($post->getStatus() == 'opened' && $this->getUser() && $form->isSubmitted() && $form->isValid()) {
             $comment->setCreatedAt(new \DateTimeImmutable());
             $comment->setStatus('opened');
