@@ -26,11 +26,6 @@
             <div class="col-md-8">
                 {{ form_row(formPost.title) }}
             </div>            
-            {% if is_granted('ROLE_ADMIN') %}
-            <div class="col-md-4">
-                {{ form_row(formPost.status) }}
-            </div>
-            {% endif %}
         </div>
         {{ form_row(formPost.content) }}
         <div class="col-12">
@@ -65,15 +60,21 @@
   <a href="{{path('app_post', {'id': post.id})}}" class="list-group-item list-group-item-action">
     <div class="d-flex w-100 justify-content-between">
         <h4>{{ post.user.username }}</h4>
-        <small class="text-muted">{{ post.createdat|date("d/m/Y à H:i") }}</small>
+        <small class="text-muted">{{ post.createdat|format_datetime('long', 'short', locale='fr') }}</small>
     </div>
         <h5 class="mb-1 text-muted">{{ post.title }}</h5>
         <p>{{ post.content }}</p>
-        <small class="text-muted"><i class="fas fa-reply"></i> {{ post.countComments }}</small>
+        <div class="d-flex w-100 justify-content-between">
+            <small class="text-muted"><i class="fas fa-reply"></i> {{ post.countComments }}</small>
+            {% if post.status == 'closed' %}
+            <small class="text-muted"><i class="fas fa-lock"></i> Fermé</small>
+            {% endif %}
+        </div>
   </a>
 </div>
 {% endfor %}
 
+{% if pages > 0 %}
 <nav>
     <ul class="pagination justify-content-center">
         <!-- Lien vers la page précédente (désactivé si on se trouve sur la 1ère page) -->
@@ -92,7 +93,6 @@
         </li>
     </ul>
 </nav>
-
-
+{% endif %}
 
 {% endblock %}

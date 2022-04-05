@@ -62,6 +62,8 @@ class PostRepository extends ServiceEntityRepository
             ->addSelect('count(c.id) AS countComments')
             ->leftJoin('p.comments', 'c')
             ->groupBy('p.id')
+            ->andWhere('p.status != :status')
+            ->setParameter('status', "moderated")
             ->setFirstResult($offset)
             ->setMaxResults(self::perPage)
         ;
@@ -75,8 +77,7 @@ class PostRepository extends ServiceEntityRepository
         }
 
         if ($search) {
-            $req->where('p.title LIKE :search')
-            ->orWhere('p.content LIKE :hashtag')
+            $req->andWhere('p.title LIKE :search OR p.content LIKE :hashtag')
             ->setParameter('search', "%$search%")
             ->setParameter('hashtag', "%#$search%");
         }
@@ -93,11 +94,12 @@ class PostRepository extends ServiceEntityRepository
 
     public function countPages($search = null){
         $req = $this->createQueryBuilder('p')
-            ->select('count(p.id) AS count');
+            ->select('count(p.id) AS count')
+            ->andWhere('p.status != :status')
+            ->setParameter('status', "moderated");
 
         if ($search) {
-            $req->where('p.title LIKE :search')
-            ->orWhere('p.content LIKE :hashtag')
+            $req->andWhere('p.title LIKE :search OR p.content LIKE :hashtag')
             ->setParameter('search', "%$search%")
             ->setParameter('hashtag', "%#$search%");
         }
