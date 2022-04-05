@@ -32,6 +32,11 @@
 
                 <ul class="navbar-nav">
                     {% if app.user %}
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li class="nav-item mr-auto">
+                                <a class="nav-link headerLinks font-weight-bold" href="{{ path("admin") }}">DashBoard</a>
+                            </li>
+                        {% endif %}    
                         <li class="nav-item mr-auto">
                             <a class="nav-link headerLinks font-weight-bold" href="#">{{ app.user.username }}</a>
                         </li>

@@ -31,7 +31,7 @@ class Post
     #[ORM\JoinColumn(nullable: false)]
     private $user;
 
-    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'post')]
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'post', cascade:['remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private $comments;
 

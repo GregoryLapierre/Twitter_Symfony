@@ -24,15 +24,18 @@ class IndexController extends AbstractController
         $page = $request->get('page') ?? 1;
         $search = $request->get('search') ?? 0;
         $order = $request->get('order') ?? 'popular';
+        
+        if(empty($search))
+        {
+            $search = 0;
+        }
 
         $posts = $postRepository->search($page, $search, $order);
         
-        
-
         $pages = $postRepository->countPages($search);
 
         $post = new Post();
-        $post->setStatus('Ouvert');
+        $post->setStatus('opened');
         $form = $this->createFormBuilder($post)
                 ->add('title', TextType::class,[
                 'label'=>'Titre'
@@ -42,21 +45,10 @@ class IndexController extends AbstractController
                 'attr' =>['rows'=>5]
                 ]);
 
-        if ($this->isGranted('ROLE_ADMIN')) {
-            $form->add('status', ChoiceType::class, [
-            'choices'  => [
-                'opened' => 'Ouvert',
-                'closed' => 'Fermé',
-                'moderated' => 'Modéré'       
-                ],
-            'placeholder'=>'Choisir un statut',
-            'label'=>'Statut'   
-            ]);
-        };
         $form = $form->getForm();
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid())
+        if($this->getUser() && $form->isSubmitted() && $form->isValid())
         {
             $user = $this->getUser();
 
