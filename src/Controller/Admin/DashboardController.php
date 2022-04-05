@@ -3,9 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Post;
-use App\Entity\User;
 use App\Entity\Comment;
-use App\Controller\Admin\PostCrudController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -49,6 +47,7 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
+        // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
         yield MenuItem::linktoRoute('Back to the website', 'fas fa-home', 'app_index');
         yield MenuItem::linkToCrud('Posts', 'fas fa-map-marker-alt', Post::class);
         yield MenuItem::linkToCrud('Comments', 'fas fa-comments', Comment::class);

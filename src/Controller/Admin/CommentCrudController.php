@@ -18,7 +18,6 @@ class CommentCrudController extends AbstractCrudController
     {
         return $actions->disable(Action::NEW);
     }
-    
     /*
     public function configureFields(string $pageName): iterable
     {

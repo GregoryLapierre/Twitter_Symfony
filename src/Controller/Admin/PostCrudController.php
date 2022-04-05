@@ -3,8 +3,10 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Post;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
 class PostCrudController extends AbstractCrudController
@@ -14,20 +16,24 @@ class PostCrudController extends AbstractCrudController
         return Post::class;
     }
 
-    public function configureActions(Actions $actions): Actions
-    {
-        return $actions->disable(Action::NEW);
-        
+    public function createEntity(string $entityFqcn){
+        $post = new Post();
+        $post->setUser($this->getUser());
+        return $post;
     }
-
-    /*
+    
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id'),
             TextField::new('title'),
-            TextEditorField::new('description'),
+            TextareaField::new('content'),
+            ChoiceField::new('status')->setChoices([
+                'Ouvert' => 'opened',
+                'Modéré' => 'moderated',
+                'Fermé' => 'closed'
+            ]),
+            DateTimeField::new('created_at')
         ];
     }
-    */
+    
 }

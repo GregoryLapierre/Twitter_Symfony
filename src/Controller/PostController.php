@@ -30,9 +30,9 @@ class PostController extends AbstractController
         ->handleRequest($request);
 
 
-        if($this->getUser() && $form->isSubmitted() && $form->isValid()) {
+        if($post->getStatus() == 'opened' && $this->getUser() && $form->isSubmitted() && $form->isValid()) {
             $comment->setCreatedAt(new \DateTimeImmutable());
-            $comment->setStatus('Ouvert');
+            $comment->setStatus('opened');
             $comment->setUser($this->getUser());
             $comment->setPost($post);
 
