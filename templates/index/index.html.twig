@@ -23,7 +23,7 @@
         <h2>Ajout d'un statut</h2>
         {{ form_start(formPost) }}
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-12">
                 {{ form_row(formPost.title) }}
             </div>            
         </div>
@@ -55,7 +55,7 @@
   </ul>
 </div>
 
-<div class="">
+<div class="mx-5">
     <h5>{{ (posts|length) }} résultats</h5>
 </div>
 
@@ -63,7 +63,7 @@
 <div class="list-group">
   <a href="{{path('app_post', {'id': post.id})}}" class="list-group-item list-group-item-action">
     <div class="d-flex w-100 justify-content-between">
-        <h4>{{ post.user.username }}</h4>
+        <h5>{{ post.user.username }}</h5>
         <small class="text-muted">{{ post.createdat|format_datetime('long', 'short', locale='fr') }}</small>
     </div>
         <h5 class="mb-1 text-muted">{{ post.title }}</h5>
